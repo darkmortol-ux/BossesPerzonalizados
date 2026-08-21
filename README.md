@@ -66,11 +66,3 @@ Familiar Guardián.
 
 **Control/Utilidad:** Empuje en Área, Ceguera, Confusión, Salto Repentino, Grito de Alarma,
 Marca de Objetivo.
-
-## Notas de implementación / posibles ajustes
-
-- "Golpe Crítico" y "Furia"/"Fase Invulnerable" están simplificados (efecto inmediato /
-  un solo umbral de vida) para la primera versión; se pueden ampliar a múltiples fases (75/50/25%)
-  si se quiere más profundidad.
-- No se compiló localmente (el entorno de desarrollo no tiene acceso al repositorio de Paper);
-  revisar con `mvn clean package` antes de desplegar.
