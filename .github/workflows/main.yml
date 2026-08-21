@@ -1,0 +1,39 @@
+name: Build y Release
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compilar con Maven
+        run: mvn -B clean package
+
+      - name: Eliminar release 'latest' anterior
+        run: gh release delete latest --yes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Crear release 'latest'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: "Última compilación"
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: "target/*.jar"
+          token: ${{ secrets.GITHUB_TOKEN }}
