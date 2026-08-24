@@ -8,7 +8,7 @@ description: Crea bosses personalizados con habilidades, armadura, encantamiento
 commands:
   boss:
     description: Comando principal de BossPersonalizados
-    usage: /boss <crear|lista|editar|eliminar|cancelar>
+    usage: /boss <crear|lista|editar|eliminar|eliminarpunto|cancelar>
     permission: bosspersonalizados.admin
 
 permissions:

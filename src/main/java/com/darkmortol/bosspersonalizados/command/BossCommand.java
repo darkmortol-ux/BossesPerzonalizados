@@ -27,7 +27,7 @@ public class BossCommand implements CommandExecutor {
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage(Component.text("Uso: /boss <crear|lista|editar|eliminar|cancelar>", NamedTextColor.YELLOW));
+            sender.sendMessage(Component.text("Uso: /boss <crear|lista|editar|eliminar|eliminarpunto|cancelar>", NamedTextColor.YELLOW));
             return true;
         }
 
@@ -35,8 +35,9 @@ public class BossCommand implements CommandExecutor {
             case "crear" -> crear(sender, args);
             case "lista" -> lista(sender);
             case "eliminar" -> eliminar(sender, args);
+            case "eliminarpunto" -> eliminarPunto(sender, args);
             case "cancelar" -> cancelar(sender);
-            default -> sender.sendMessage(Component.text("Subcomando desconocido. Uso: /boss <crear|lista|editar|eliminar|cancelar>", NamedTextColor.YELLOW));
+            default -> sender.sendMessage(Component.text("Subcomando desconocido. Uso: /boss <crear|lista|editar|eliminar|eliminarpunto|cancelar>", NamedTextColor.YELLOW));
         }
         return true;
     }
@@ -82,9 +83,38 @@ public class BossCommand implements CommandExecutor {
         try {
             int id = Integer.parseInt(args[1]);
             if (plugin.getStorage().obtener(id) == null) { sender.sendMessage(Component.text("No existe un boss con ID " + id, NamedTextColor.RED)); return; }
+
+            // Despawnea la entidad viva (si la hay) y limpia todo el seguimiento antes de borrar el registro.
+            plugin.getAbilityRunner().despawnBoss(id);
+            plugin.getSpawnPointManager().quitarInstanciaActiva(id);
             plugin.getStorage().eliminar(id);
-            plugin.getAbilityRunner().quitarInstancia(id);
-            sender.sendMessage(Component.text("Boss #" + id + " eliminado del registro.", NamedTextColor.GREEN));
+
+            sender.sendMessage(Component.text("Boss #" + id + " eliminado: registro y punto de aparición borrados.", NamedTextColor.GREEN));
+        } catch (NumberFormatException ex) {
+            sender.sendMessage(Component.text("El ID debe ser un número.", NamedTextColor.RED));
+        }
+    }
+
+    private void eliminarPunto(CommandSender sender, String[] args) {
+        if (args.length < 2) { sender.sendMessage(Component.text("Uso: /boss eliminarpunto <id>", NamedTextColor.YELLOW)); return; }
+        try {
+            int id = Integer.parseInt(args[1]);
+            BossDefinition def = plugin.getStorage().obtener(id);
+            if (def == null) { sender.sendMessage(Component.text("No existe un boss con ID " + id, NamedTextColor.RED)); return; }
+            if (!def.getSpawnConfig().isUbicado()) { sender.sendMessage(Component.text("El boss #" + id + " todavía no tiene punto de aparición ubicado.", NamedTextColor.YELLOW)); return; }
+
+            // Despawnea la entidad viva (si la hay), pero conserva habilidades/armadura/respawn/radios del boss.
+            plugin.getAbilityRunner().despawnBoss(id);
+            plugin.getSpawnPointManager().quitarInstanciaActiva(id);
+            def.getSpawnConfig().resetear();
+            plugin.getStorage().guardar();
+
+            sender.sendMessage(Component.text("Punto de aparición del boss #" + id + " eliminado. La configuración del boss se conserva.", NamedTextColor.GREEN));
+
+            if (sender instanceof Player player) {
+                player.getInventory().addItem(com.darkmortol.bosspersonalizados.spawn.BossSpawnEggItem.crear(def));
+                player.sendMessage(Component.text("Te di un nuevo huevo para volver a ubicarlo donde quieras.", NamedTextColor.YELLOW));
+            }
         } catch (NumberFormatException ex) {
             sender.sendMessage(Component.text("El ID debe ser un número.", NamedTextColor.RED));
         }

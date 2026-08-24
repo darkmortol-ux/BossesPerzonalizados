@@ -11,7 +11,11 @@ respawn y radios de detección/ataque.
   `ENDER_DRAGON` y `WITHER`, que no tienen huevo de spawn. También sirve para elegir cualquier
   otro mob por nombre si preferís no usar la GUI.
 - `/boss lista` — muestra todos los bosses creados con su ID, mob y estado (vivo / muerto / sin ubicar).
-- `/boss eliminar <id>` — borra un boss del registro.
+- `/boss eliminar <id>` — borra el boss por completo: despawnea la entidad si está viva en el mundo,
+  quita el punto de aparición y elimina el registro entero de `bosses.yml`.
+- `/boss eliminarpunto <id>` — despawnea la entidad si está viva y quita **solo** el punto de
+  aparición, conservando habilidades, armadura, respawn y radios ya configurados. Si lo ejecuta
+  un jugador, recibe un huevo nuevo para volver a ubicarlo en otro lugar.
 - `/boss cancelar` — cancela el wizard en curso.
 
 Permiso: `bosspersonalizados.admin` (default: op).
@@ -66,3 +70,11 @@ Familiar Guardián.
 
 **Control/Utilidad:** Empuje en Área, Ceguera, Confusión, Salto Repentino, Grito de Alarma,
 Marca de Objetivo.
+
+## Notas de implementación / posibles ajustes
+
+- "Golpe Crítico" y "Furia"/"Fase Invulnerable" están simplificados (efecto inmediato /
+  un solo umbral de vida) para la primera versión; se pueden ampliar a múltiples fases (75/50/25%)
+  si se quiere más profundidad.
+- No se compiló localmente (el entorno de desarrollo no tiene acceso al repositorio de Paper);
+  revisar con `mvn clean package` antes de desplegar.

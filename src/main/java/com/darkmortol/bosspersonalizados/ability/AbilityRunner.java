@@ -42,6 +42,15 @@ public class AbilityRunner {
         instanciasActivas.remove(bossId);
     }
 
+    /** Elimina del mundo la entidad viva del boss (si existe) y limpia su seguimiento. */
+    public void despawnBoss(int bossId) {
+        LivingEntity entidad = entidadesActivas.get(bossId);
+        if (entidad != null && entidad.isValid()) {
+            entidad.remove();
+        }
+        quitarInstancia(bossId);
+    }
+
     private void revisarTodos() {
         for (Map.Entry<Integer, LivingEntity> entry : entidadesActivas.entrySet()) {
             int bossId = entry.getKey();

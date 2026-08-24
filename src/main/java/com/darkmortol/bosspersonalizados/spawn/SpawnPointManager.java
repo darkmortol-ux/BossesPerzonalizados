@@ -120,4 +120,9 @@ public class SpawnPointManager {
         instanciasActivas.remove(bossId);
         plugin.getStorage().guardar();
     }
+
+    /** Limpia el seguimiento local de instancia activa (usado al eliminar/despawnear un boss a la fuerza). */
+    public void quitarInstanciaActiva(int bossId) {
+        instanciasActivas.remove(bossId);
+    }
 }

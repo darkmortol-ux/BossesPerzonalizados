@@ -44,6 +44,18 @@ public class SpawnConfig {
         this.ubicado = true;
     }
 
+    /** Quita el punto de aparición (sin tocar habilidades/armadura/respawn configurados). */
+    public void resetear() {
+        this.mundo = null;
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.ubicado = false;
+        this.vivoActualmente = false;
+        this.muertoParaSiempre = false;
+        this.ultimaMuerteMillis = 0L;
+    }
+
     public boolean isVivoActualmente() { return vivoActualmente; }
     public void setVivoActualmente(boolean vivoActualmente) { this.vivoActualmente = vivoActualmente; }
 
