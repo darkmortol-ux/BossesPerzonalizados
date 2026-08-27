@@ -114,9 +114,15 @@ public class SpawnPointManager {
         BossDefinition def = plugin.getStorage().obtener(bossId);
         if (def == null) return;
         SpawnConfig cfg = def.getSpawnConfig();
-        cfg.setVivoActualmente(false);
-        cfg.setUltimaMuerteMillis(System.currentTimeMillis());
-        if (!cfg.isRespawnHabilitado()) cfg.setMuertoParaSiempre(true);
+
+        if (!cfg.isRespawnHabilitado()) {
+            // Boss de "una sola vez": al morir se borra automaticamente el punto de aparicion.
+            cfg.resetear();
+        } else {
+            cfg.setVivoActualmente(false);
+            cfg.setUltimaMuerteMillis(System.currentTimeMillis());
+        }
+
         instanciasActivas.remove(bossId);
         plugin.getStorage().guardar();
     }

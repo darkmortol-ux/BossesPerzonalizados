@@ -5,7 +5,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 public class BossGuiHolder implements InventoryHolder {
 
-    public enum GuiType { MOB_SELECTION, ABILITY_SELECTION, ARMOR_SELECTION, ENCHANT_SELECTION, RESPAWN_CONFIG, RADIUS_CONFIG }
+    public enum GuiType { MOB_SELECTION, ABILITY_SELECTION, ARMOR_SELECTION, ENCHANT_SELECTION, RESPAWN_CONFIG, RADIUS_CONFIG, COIN_REWARD, ITEM_REWARD }
 
     private final GuiType tipo;
     private Inventory inventory;

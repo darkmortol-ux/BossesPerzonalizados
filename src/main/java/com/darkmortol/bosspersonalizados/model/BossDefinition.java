@@ -2,6 +2,7 @@ package com.darkmortol.bosspersonalizados.model;
 
 import com.darkmortol.bosspersonalizados.ability.AbilityType;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -22,6 +23,9 @@ public class BossDefinition {
     private double vida = 20.0;
     private double dano = 4.0;
     private int experiencia = 10;
+
+    private double recompensaMonedas = 500.0;
+    private ItemStack recompensaItem; // null = sin recompensa de item
 
     private final SpawnConfig spawnConfig = new SpawnConfig();
 
@@ -59,5 +63,12 @@ public class BossDefinition {
     public int getExperiencia() { return experiencia; }
     public void setExperiencia(int experiencia) { this.experiencia = experiencia; }
 
+    public double getRecompensaMonedas() { return recompensaMonedas; }
+    public void setRecompensaMonedas(double recompensaMonedas) { this.recompensaMonedas = Math.max(0, recompensaMonedas); }
+
+    public ItemStack getRecompensaItem() { return recompensaItem; }
+    public void setRecompensaItem(ItemStack recompensaItem) { this.recompensaItem = recompensaItem; }
+
     public SpawnConfig getSpawnConfig() { return spawnConfig; }
 }
+

@@ -50,6 +50,10 @@ public class BossStorage {
                 def.setVida(sec.getDouble("vida", 20.0));
                 def.setDano(sec.getDouble("dano", 4.0));
                 def.setExperiencia(sec.getInt("experiencia", 10));
+                def.setRecompensaMonedas(sec.getDouble("recompensa-monedas", 500.0));
+                if (sec.isItemStack("recompensa-item")) {
+                    def.setRecompensaItem(sec.getItemStack("recompensa-item"));
+                }
 
                 for (String hab : sec.getStringList("habilidades")) {
                     try { def.getHabilidades().add(AbilityType.valueOf(hab)); } catch (IllegalArgumentException ignored) {}
@@ -104,6 +108,10 @@ public class BossStorage {
             yaml.set(base + ".vida", def.getVida());
             yaml.set(base + ".dano", def.getDano());
             yaml.set(base + ".experiencia", def.getExperiencia());
+            yaml.set(base + ".recompensa-monedas", def.getRecompensaMonedas());
+            if (def.getRecompensaItem() != null) {
+                yaml.set(base + ".recompensa-item", def.getRecompensaItem());
+            }
 
             java.util.List<String> habs = new java.util.ArrayList<>();
             for (AbilityType tipo : def.getHabilidades()) habs.add(tipo.name());

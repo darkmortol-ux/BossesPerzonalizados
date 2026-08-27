@@ -9,7 +9,7 @@ import java.util.UUID;
 /** Guarda el progreso de un jugador mientras arma un boss paso a paso. */
 public class WizardSession {
 
-    public enum Paso { NOMBRE_MOB, HABILIDADES, ARMADURA, ENCANTAMIENTOS, RESPAWN, RADIOS, STATS_VIDA, STATS_DANO, STATS_EXP, FINALIZADO }
+    public enum Paso { NOMBRE_MOB, HABILIDADES, ARMADURA, ENCANTAMIENTOS, RESPAWN, RADIOS, RECOMPENSA_MONEDAS, RECOMPENSA_ITEM, STATS_VIDA, STATS_DANO, STATS_EXP, FINALIZADO }
 
     private static final Map<UUID, WizardSession> SESIONES = new HashMap<>();
 

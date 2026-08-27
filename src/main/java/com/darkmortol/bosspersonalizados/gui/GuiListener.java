@@ -45,6 +45,8 @@ public class GuiListener implements Listener {
             case ENCHANT_SELECTION -> manejarEncantamientos(player, sesion, clicked, slot, e);
             case RESPAWN_CONFIG -> manejarRespawn(player, sesion, slot, e);
             case RADIUS_CONFIG -> manejarRadios(player, sesion, slot, e);
+            case COIN_REWARD -> manejarMonedas(player, sesion, slot, e);
+            case ITEM_REWARD -> manejarItemRecompensa(player, sesion, slot, e);
         }
     }
 
@@ -212,9 +214,8 @@ public class GuiListener implements Listener {
         if (slot == RadiusConfigGUI.SLOT_ATRAS) { player.openInventory(RespawnConfigGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.RESPAWN); return; }
         if (slot == RadiusConfigGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
         if (slot == RadiusConfigGUI.SLOT_SIGUIENTE) {
-            sesion.setPaso(WizardSession.Paso.STATS_VIDA);
-            player.closeInventory();
-            player.sendMessage(Component.text("Escribe en el chat la VIDA del boss (numero, ej: 40):", NamedTextColor.GOLD));
+            sesion.setPaso(WizardSession.Paso.RECOMPENSA_MONEDAS);
+            player.openInventory(CoinRewardGUI.build(sesion));
             return;
         }
         if (slot == RadiusConfigGUI.SLOT_DETECCION_MAS) cfg.setRadioDeteccion(cfg.getRadioDeteccion() + 5);
@@ -223,6 +224,56 @@ public class GuiListener implements Listener {
         else if (slot == RadiusConfigGUI.SLOT_ATAQUE_MENOS) cfg.setRadioAtaque(Math.max(1, cfg.getRadioAtaque() - 5));
         else return;
         RadiusConfigGUI.refrescar(e.getInventory(), sesion);
+    }
+
+    // ===== PASO 7: RECOMPENSA EN MONEDAS =====
+    private void manejarMonedas(Player player, WizardSession sesion, int slot, InventoryClickEvent e) {
+        BossDefinition def = sesion.getDefinicion();
+
+        if (slot == CoinRewardGUI.SLOT_ATRAS) { player.openInventory(RadiusConfigGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.RADIOS); return; }
+        if (slot == CoinRewardGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
+        if (slot == CoinRewardGUI.SLOT_SIGUIENTE) {
+            sesion.setPaso(WizardSession.Paso.RECOMPENSA_ITEM);
+            player.openInventory(ItemRewardGUI.build(sesion));
+            return;
+        }
+        if (slot == CoinRewardGUI.SLOT_MAS) def.setRecompensaMonedas(def.getRecompensaMonedas() + 50);
+        else if (slot == CoinRewardGUI.SLOT_MENOS) def.setRecompensaMonedas(def.getRecompensaMonedas() - 50);
+        else return;
+        CoinRewardGUI.refrescar(e.getInventory(), sesion);
+    }
+
+    // ===== PASO 8: RECOMPENSA EN ITEM =====
+    private void manejarItemRecompensa(Player player, WizardSession sesion, int slot, InventoryClickEvent e) {
+        BossDefinition def = sesion.getDefinicion();
+
+        if (slot == ItemRewardGUI.SLOT_ATRAS) { player.openInventory(CoinRewardGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.RECOMPENSA_MONEDAS); return; }
+        if (slot == ItemRewardGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
+
+        if (slot == ItemRewardGUI.SLOT_SALTAR) {
+            def.setRecompensaItem(null);
+            avanzarAVida(player, sesion);
+            return;
+        }
+
+        if (slot == ItemRewardGUI.SLOT_CONFIRMAR) {
+            // El primer slot del hotbar del jugador (mas a la izquierda) es el indice 0.
+            ItemStack itemEnSlot1 = player.getInventory().getItem(0);
+            if (itemEnSlot1 == null || itemEnSlot1.getType().isAir()) {
+                player.sendMessage(Component.text("No hay ningún ítem en el primer slot de tu hotbar.", NamedTextColor.RED));
+                return;
+            }
+            def.setRecompensaItem(itemEnSlot1.clone());
+            player.getInventory().setItem(0, null);
+            player.sendMessage(Component.text("Recompensa asignada: " + itemEnSlot1.getAmount() + "x " + itemEnSlot1.getType().name(), NamedTextColor.GREEN));
+            avanzarAVida(player, sesion);
+        }
+    }
+
+    private void avanzarAVida(Player player, WizardSession sesion) {
+        sesion.setPaso(WizardSession.Paso.STATS_VIDA);
+        player.closeInventory();
+        player.sendMessage(Component.text("Escribe en el chat la VIDA del boss (numero, ej: 40):", NamedTextColor.GOLD));
     }
 
     private void cancelar(Player player, WizardSession sesion) {

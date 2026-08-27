@@ -2,6 +2,7 @@ package com.darkmortol.bosspersonalizados;
 
 import com.darkmortol.bosspersonalizados.ability.AbilityRunner;
 import com.darkmortol.bosspersonalizados.command.BossCommand;
+import com.darkmortol.bosspersonalizados.economy.VaultEconomyHook;
 import com.darkmortol.bosspersonalizados.gui.ChatInputListener;
 import com.darkmortol.bosspersonalizados.gui.GuiListener;
 import com.darkmortol.bosspersonalizados.spawn.BossEventListener;
@@ -14,6 +15,7 @@ public class BossPersonalizadosPlugin extends JavaPlugin {
     private BossStorage storage;
     private SpawnPointManager spawnPointManager;
     private AbilityRunner abilityRunner;
+    private VaultEconomyHook economia;
 
     @Override
     public void onEnable() {
@@ -22,6 +24,7 @@ public class BossPersonalizadosPlugin extends JavaPlugin {
         this.storage = new BossStorage(this);
         this.spawnPointManager = new SpawnPointManager(this);
         this.abilityRunner = new AbilityRunner(this);
+        this.economia = new VaultEconomyHook(this);
 
         getServer().getPluginManager().registerEvents(new GuiListener(this), this);
         getServer().getPluginManager().registerEvents(new ChatInputListener(this), this);
@@ -33,7 +36,8 @@ public class BossPersonalizadosPlugin extends JavaPlugin {
         spawnPointManager.iniciar();
         abilityRunner.iniciar();
 
-        getLogger().info("BossPersonalizados habilitado. " + storage.todos().size() + " bosses cargados.");
+        getLogger().info("BossPersonalizados habilitado. " + storage.todos().size() + " bosses cargados."
+                + (economia.disponible() ? " Vault detectado: recompensas en monedas activas." : " Vault no detectado: recompensas en monedas desactivadas."));
     }
 
     @Override
@@ -44,4 +48,5 @@ public class BossPersonalizadosPlugin extends JavaPlugin {
     public BossStorage getStorage() { return storage; }
     public SpawnPointManager getSpawnPointManager() { return spawnPointManager; }
     public AbilityRunner getAbilityRunner() { return abilityRunner; }
+    public VaultEconomyHook getEconomia() { return economia; }
 }

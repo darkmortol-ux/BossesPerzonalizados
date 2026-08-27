@@ -11,6 +11,8 @@ commands:
     usage: /boss <crear|lista|editar|eliminar|eliminarpunto|cancelar>
     permission: bosspersonalizados.admin
 
+softdepend: [Vault]
+
 permissions:
   bosspersonalizados.admin:
     description: Permite crear, editar y eliminar bosses personalizados

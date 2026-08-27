@@ -33,13 +33,20 @@ Permiso: `bosspersonalizados.admin` (default: op).
 5. **Respawn** — una sola vez, o con respawn cada X minutos (+1/+5/+10, -1/-5/-10).
 6. **Radios** — radio de detección (a qué distancia aparece cuando se acerca un jugador) y
    radio de ataque/persecución (+5/-5 bloques).
-7. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
+7. **Recompensa en monedas** — arranca en 500, se suma/resta de 50 en 50. Se entrega al
+   jugador que mata al boss (requiere Vault + un plugin de economía; si no están instalados,
+   el plugin sigue funcionando pero no reparte monedas).
+8. **Recompensa en ítem** *(opcional)* — colocá el ítem que querés que suelte el boss al morir
+   en el **primer slot de tu hotbar** (el más a la izquierda) mientras esta pantalla está
+   abierta, y tocá "Confirmar". Si hay más de 1 unidad en ese slot, se toma el stack completo.
+   "Saltar" si no querés recompensa en ítem.
+9. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
    experiencia se escriben por chat.
-8. Al terminar, el jugador recibe un **huevo de boss** personalizado. Clic derecho sobre un
-   bloque coloca el punto de aparición.
+10. Al terminar, el jugador recibe un **huevo de boss** personalizado. Clic derecho sobre un
+    bloque coloca el punto de aparición.
 
 En cualquier pantalla se puede usar "Atrás" para volver, "Cancelar" para abortar todo, o
-avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encantamientos).
+avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encantamientos / ítem).
 
 ## Funcionamiento en el mundo
 
@@ -48,8 +55,13 @@ avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encant
 - Otro scheduler revisa cada segundo los bosses vivos: dispara habilidades por cooldown
   aleatorio (dentro de su rango), por proximidad (solo si hay un jugador cerca), o al cruzar
   umbrales de vida baja (furia, huida, fase invulnerable, refuerzos), saltando el cooldown.
-- Al morir, el boss da la experiencia configurada al jugador que lo mató y, si tiene respawn
-  habilitado, vuelve a estar disponible tras el intervalo configurado.
+- Al morir, el boss:
+  - da la experiencia configurada al jugador que lo mató;
+  - le deposita la recompensa en monedas (vía Vault, si está disponible);
+  - suelta la recompensa en ítem en el suelo, si se configuró una;
+  - si tiene respawn habilitado, vuelve a estar disponible tras el intervalo configurado;
+  - si es de **"una sola vez"**, el punto de aparición se borra automáticamente (igual que
+    `/boss eliminarpunto`) y no vuelve a aparecer hasta que se le coloque un huevo de nuevo.
 
 ## Persistencia
 
@@ -71,3 +83,17 @@ Familiar Guardián.
 **Control/Utilidad:** Empuje en Área, Ceguera, Confusión, Salto Repentino, Grito de Alarma,
 Marca de Objetivo.
 
+## Economía (Vault)
+
+La recompensa en monedas requiere **Vault** + un plugin de economía (Essentials, CMI, etc.)
+instalados en el servidor. Está declarado como `softdepend` en `plugin.yml`, así que si no
+están presentes el plugin arranca igual: solo se salta el depósito de monedas (se loguea un
+aviso una única vez) sin afectar el resto de las funciones.
+
+## Notas de implementación / posibles ajustes
+
+- "Golpe Crítico" y "Furia"/"Fase Invulnerable" están simplificados (efecto inmediato /
+  un solo umbral de vida) para la primera versión; se pueden ampliar a múltiples fases (75/50/25%)
+  si se quiere más profundidad.
+- No se compiló localmente (el entorno de desarrollo no tiene acceso al repositorio de Paper);
+  revisar con `mvn clean package` antes de desplegar.

@@ -55,7 +55,13 @@ public class BossEventListener implements Listener {
         BossDefinition def = plugin.getStorage().obtener(bossId);
         if (def != null) {
             Player killer = e.getEntity().getKiller();
-            if (killer != null) killer.giveExp(def.getExperiencia());
+            if (killer != null) {
+                killer.giveExp(def.getExperiencia());
+                plugin.getEconomia().depositar(killer, def.getRecompensaMonedas(), plugin);
+            }
+            if (def.getRecompensaItem() != null) {
+                e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), def.getRecompensaItem().clone());
+            }
         }
 
         plugin.getAbilityRunner().quitarInstancia(bossId);
