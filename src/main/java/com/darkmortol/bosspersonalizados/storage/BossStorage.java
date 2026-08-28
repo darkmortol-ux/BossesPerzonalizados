@@ -85,8 +85,10 @@ public class BossStorage {
                     spawn.setRespawnMinutos(spawnSec.getInt("respawn-minutos", 0));
                     spawn.setRadioDeteccion(spawnSec.getDouble("radio-deteccion", 15.0));
                     spawn.setRadioAtaque(spawnSec.getDouble("radio-ataque", 20.0));
+                    spawn.setTiempoGraciaSegundos(spawnSec.getInt("tiempo-gracia-segundos", 30));
                     if (spawnSec.getBoolean("ubicado", false)) {
-                        spawn.ubicar(spawnSec.getString("mundo"), spawnSec.getDouble("x"), spawnSec.getDouble("y"), spawnSec.getDouble("z"));
+                        spawn.cargarUbicacion(spawnSec.getString("mundo"), spawnSec.getDouble("x"), spawnSec.getDouble("y"), spawnSec.getDouble("z"));
+                        spawn.setMomentoColocacionMillis(spawnSec.getLong("momento-colocacion", 0L));
                     }
                 }
 
@@ -133,12 +135,14 @@ public class BossStorage {
             yaml.set(spawnBase + ".respawn-minutos", spawn.getRespawnMinutos());
             yaml.set(spawnBase + ".radio-deteccion", spawn.getRadioDeteccion());
             yaml.set(spawnBase + ".radio-ataque", spawn.getRadioAtaque());
+            yaml.set(spawnBase + ".tiempo-gracia-segundos", spawn.getTiempoGraciaSegundos());
             yaml.set(spawnBase + ".ubicado", spawn.isUbicado());
             if (spawn.isUbicado()) {
                 yaml.set(spawnBase + ".mundo", spawn.getMundo());
                 yaml.set(spawnBase + ".x", spawn.getX());
                 yaml.set(spawnBase + ".y", spawn.getY());
                 yaml.set(spawnBase + ".z", spawn.getZ());
+                yaml.set(spawnBase + ".momento-colocacion", spawn.getMomentoColocacionMillis());
             }
         }
 

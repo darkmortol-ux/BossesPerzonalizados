@@ -70,5 +70,21 @@ public class BossDefinition {
     public void setRecompensaItem(ItemStack recompensaItem) { this.recompensaItem = recompensaItem; }
 
     public SpawnConfig getSpawnConfig() { return spawnConfig; }
+
+    /** Copia profunda: usada por /boss editar para no mutar el boss original hasta confirmar. */
+    public static BossDefinition copiar(BossDefinition original) {
+        BossDefinition copia = new BossDefinition(original.id, original.nombre, original.tipoMob);
+        copia.habilidades.addAll(original.habilidades);
+        for (Map.Entry<Slot, ArmorPiece> entry : original.equipo.entrySet()) {
+            copia.equipo.put(entry.getKey(), ArmorPiece.copiar(entry.getValue()));
+        }
+        copia.vida = original.vida;
+        copia.dano = original.dano;
+        copia.experiencia = original.experiencia;
+        copia.recompensaMonedas = original.recompensaMonedas;
+        copia.recompensaItem = original.recompensaItem != null ? original.recompensaItem.clone() : null;
+        copia.spawnConfig.copiarDesde(original.spawnConfig);
+        return copia;
+    }
 }
 

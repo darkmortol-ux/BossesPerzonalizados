@@ -34,6 +34,7 @@ public class BossCommand implements CommandExecutor {
         switch (args[0].toLowerCase()) {
             case "crear" -> crear(sender, args);
             case "lista" -> lista(sender);
+            case "editar" -> editar(sender, args);
             case "eliminar" -> eliminar(sender, args);
             case "eliminarpunto" -> eliminarPunto(sender, args);
             case "cancelar" -> cancelar(sender);
@@ -51,6 +52,42 @@ public class BossCommand implements CommandExecutor {
 
         if (args.length >= 3) {
             // Uso especial para Ender Dragon / Wither (no tienen huevo de spawn) o para saltar la GUI de mob.
+            try {
+                EntityType tipo = EntityType.valueOf(args[2].toUpperCase());
+                sesion.getDefinicion().setTipoMob(tipo);
+                sesion.setPaso(WizardSession.Paso.HABILIDADES);
+                player.openInventory(com.darkmortol.bosspersonalizados.gui.AbilitySelectionGUI.build(sesion));
+                return;
+            } catch (IllegalArgumentException ex) {
+                player.sendMessage(Component.text("Tipo de mob inválido: " + args[2], NamedTextColor.RED));
+                WizardSession.cancelar(player.getUniqueId());
+                return;
+            }
+        }
+
+        player.openInventory(MobSelectionGUI.build());
+    }
+
+    private void editar(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) { sender.sendMessage(Component.text("Solo un jugador puede editar bosses.", NamedTextColor.RED)); return; }
+        if (args.length < 2) { player.sendMessage(Component.text("Uso: /boss editar <id> [tipo_de_mob]", NamedTextColor.YELLOW)); return; }
+
+        int id;
+        try {
+            id = Integer.parseInt(args[1]);
+        } catch (NumberFormatException ex) {
+            player.sendMessage(Component.text("El ID debe ser un número.", NamedTextColor.RED));
+            return;
+        }
+
+        BossDefinition existente = plugin.getStorage().obtener(id);
+        if (existente == null) { player.sendMessage(Component.text("No existe un boss con ID " + id, NamedTextColor.RED)); return; }
+
+        // Se edita sobre una COPIA: si cancelás, el boss original queda intacto.
+        WizardSession sesion = WizardSession.editar(player.getUniqueId(), existente);
+        player.sendMessage(Component.text("Editando boss #" + id + " (" + existente.getNombre() + "). Los cambios se guardan al terminar el wizard.", NamedTextColor.AQUA));
+
+        if (args.length >= 3) {
             try {
                 EntityType tipo = EntityType.valueOf(args[2].toUpperCase());
                 sesion.getDefinicion().setTipoMob(tipo);

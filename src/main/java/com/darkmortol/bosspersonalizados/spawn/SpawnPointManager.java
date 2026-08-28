@@ -42,6 +42,7 @@ public class SpawnPointManager {
             SpawnConfig cfg = def.getSpawnConfig();
             if (!cfg.isUbicado()) continue;
             if (!cfg.puedeRespawnear()) continue;
+            if (cfg.enTiempoDeGracia()) continue; // el staff todavía se está alejando
 
             World mundo = Bukkit.getWorld(cfg.getMundo());
             if (mundo == null) continue;

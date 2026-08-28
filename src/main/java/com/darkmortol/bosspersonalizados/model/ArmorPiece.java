@@ -34,6 +34,13 @@ public class ArmorPiece {
         else encantamientos.put(key, nivel);
     }
 
+    /** Copia profunda: mismo material y encantamientos, pero mapa independiente. */
+    public static ArmorPiece copiar(ArmorPiece original) {
+        ArmorPiece copia = new ArmorPiece(original.material);
+        copia.encantamientos.putAll(original.encantamientos);
+        return copia;
+    }
+
     public ItemStack toItemStack() {
         if (isVacio()) return null;
         org.bukkit.Material mat = org.bukkit.Material.matchMaterial(material);

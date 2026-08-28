@@ -66,13 +66,19 @@ public class ChatInputListener implements Listener {
         if (jugador == null) return;
         BossDefinition def = sesion.getDefinicion();
 
-        int id = plugin.getStorage().reservarNuevoId();
-        def.setId(id);
-        plugin.getStorage().registrar(def);
+        if (sesion.isEdicion()) {
+            // /boss editar: la definición ya tiene su ID original, solo se sobreescribe en el registro.
+            plugin.getStorage().registrar(def);
+            jugador.sendMessage(Component.text("Boss '" + def.getNombre() + "' (#" + def.getId() + ") actualizado.", NamedTextColor.GREEN));
+        } else {
+            int id = plugin.getStorage().reservarNuevoId();
+            def.setId(id);
+            plugin.getStorage().registrar(def);
 
-        jugador.getInventory().addItem(BossSpawnEggItem.crear(def));
-        jugador.sendMessage(Component.text("¡Boss '" + def.getNombre() + "' (#" + id + ") creado! ", NamedTextColor.GREEN)
-                .append(Component.text("Coloca el huevo para crear su punto de aparición.", NamedTextColor.YELLOW)));
+            jugador.getInventory().addItem(BossSpawnEggItem.crear(def));
+            jugador.sendMessage(Component.text("¡Boss '" + def.getNombre() + "' (#" + id + ") creado! ", NamedTextColor.GREEN)
+                    .append(Component.text("Coloca el huevo para crear su punto de aparición.", NamedTextColor.YELLOW)));
+        }
 
         WizardSession.cancelar(sesion.getJugador());
     }

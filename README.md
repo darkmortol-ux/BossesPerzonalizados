@@ -11,6 +11,13 @@ respawn y radios de detección/ataque.
   `ENDER_DRAGON` y `WITHER`, que no tienen huevo de spawn. También sirve para elegir cualquier
   otro mob por nombre si preferís no usar la GUI.
 - `/boss lista` — muestra todos los bosses creados con su ID, mob y estado (vivo / muerto / sin ubicar).
+- `/boss editar <id>` — reabre el wizard completo sobre un boss ya creado, con todos sus valores
+  actuales precargados en cada pantalla (habilidades, armadura, respawn, radios, gracia, recompensas,
+  etc). Se edita sobre una **copia**: si cancelás a mitad de camino, el boss original queda intacto;
+  los cambios solo se guardan al llegar al final del wizard. No pide un huevo nuevo ni toca el
+  punto de aparición ya colocado.
+- `/boss editar <id> <TIPO_ENTIDAD>` — igual que arriba pero saltando la pantalla de mob (útil para
+  cambiar el tipo de mob directamente, o para Ender Dragon/Wither).
 - `/boss eliminar <id>` — borra el boss por completo: despawnea la entidad si está viva en el mundo,
   quita el punto de aparición y elimina el registro entero de `bosses.yml`.
 - `/boss eliminarpunto <id>` — despawnea la entidad si está viva y quita **solo** el punto de
@@ -33,17 +40,21 @@ Permiso: `bosspersonalizados.admin` (default: op).
 5. **Respawn** — una sola vez, o con respawn cada X minutos (+1/+5/+10, -1/-5/-10).
 6. **Radios** — radio de detección (a qué distancia aparece cuando se acerca un jugador) y
    radio de ataque/persecución (+5/-5 bloques).
-7. **Recompensa en monedas** — arranca en 500, se suma/resta de 50 en 50. Se entrega al
+7. **Tiempo de gracia** — segundos desde que se coloca el huevo hasta que el boss puede aparecer
+   por primera vez, para que el staff que lo colocó tenga tiempo de alejarse. Empieza en 30
+   segundos; botones de +30s/+1min/+5min y -30s/-1min/-5min. En 0 aparece de inmediato.
+8. **Recompensa en monedas** — arranca en 500, se suma/resta de 50 en 50. Se entrega al
    jugador que mata al boss (requiere Vault + un plugin de economía; si no están instalados,
    el plugin sigue funcionando pero no reparte monedas).
-8. **Recompensa en ítem** *(opcional)* — colocá el ítem que querés que suelte el boss al morir
+9. **Recompensa en ítem** *(opcional)* — colocá el ítem que querés que suelte el boss al morir
    en el **primer slot de tu hotbar** (el más a la izquierda) mientras esta pantalla está
    abierta, y tocá "Confirmar". Si hay más de 1 unidad en ese slot, se toma el stack completo.
    "Saltar" si no querés recompensa en ítem.
-9. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
-   experiencia se escriben por chat.
-10. Al terminar, el jugador recibe un **huevo de boss** personalizado. Clic derecho sobre un
-    bloque coloca el punto de aparición.
+10. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
+    experiencia se escriben por chat.
+11. Al terminar, el jugador recibe un **huevo de boss** personalizado (solo al crear; al editar
+    no se entrega huevo nuevo). Clic derecho sobre un bloque coloca el punto de aparición y
+    arranca el tiempo de gracia.
 
 En cualquier pantalla se puede usar "Atrás" para volver, "Cancelar" para abortar todo, o
 avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encantamientos / ítem).
@@ -51,7 +62,8 @@ avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encant
 ## Funcionamiento en el mundo
 
 - Un scheduler revisa cada segundo los puntos de spawn: si hay un jugador dentro del radio
-  de detección y el boss puede aparecer (primera vez, o pasó el intervalo de respawn), lo invoca.
+  de detección, ya pasó el tiempo de gracia, y el boss puede aparecer (primera vez, o pasó el
+  intervalo de respawn), lo invoca.
 - Otro scheduler revisa cada segundo los bosses vivos: dispara habilidades por cooldown
   aleatorio (dentro de su rango), por proximidad (solo si hay un jugador cerca), o al cruzar
   umbrales de vida baja (furia, huida, fase invulnerable, refuerzos), saltando el cooldown.

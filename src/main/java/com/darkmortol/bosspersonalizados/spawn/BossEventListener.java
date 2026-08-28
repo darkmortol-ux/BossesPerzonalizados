@@ -45,6 +45,11 @@ public class BossEventListener implements Listener {
 
         item.setAmount(item.getAmount() - 1);
         player.sendMessage(Component.text("Punto de aparición creado para '" + def.getNombre() + "' (#" + def.getId() + ").", NamedTextColor.GREEN));
+
+        int gracia = def.getSpawnConfig().getTiempoGraciaSegundos();
+        if (gracia > 0) {
+            player.sendMessage(Component.text("Tenés " + gracia + " segundos de gracia para alejarte antes de que el boss pueda aparecer.", NamedTextColor.YELLOW));
+        }
     }
 
     @EventHandler
