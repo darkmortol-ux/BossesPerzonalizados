@@ -27,7 +27,7 @@ public class BossCommand implements CommandExecutor {
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage(Component.text("Uso: /boss <crear|lista|editar|eliminar|eliminarpunto|cancelar>", NamedTextColor.YELLOW));
+            sender.sendMessage(Component.text("Uso: /boss <crear|lista|editar|eliminar|eliminarpunto|huevo|cancelar>", NamedTextColor.YELLOW));
             return true;
         }
 
@@ -37,8 +37,9 @@ public class BossCommand implements CommandExecutor {
             case "editar" -> editar(sender, args);
             case "eliminar" -> eliminar(sender, args);
             case "eliminarpunto" -> eliminarPunto(sender, args);
+            case "huevo" -> huevo(sender, args);
             case "cancelar" -> cancelar(sender);
-            default -> sender.sendMessage(Component.text("Subcomando desconocido. Uso: /boss <crear|lista|editar|eliminar|eliminarpunto|cancelar>", NamedTextColor.YELLOW));
+            default -> sender.sendMessage(Component.text("Subcomando desconocido. Uso: /boss <crear|lista|editar|eliminar|eliminarpunto|huevo|cancelar>", NamedTextColor.YELLOW));
         }
         return true;
     }
@@ -154,6 +155,32 @@ public class BossCommand implements CommandExecutor {
             }
         } catch (NumberFormatException ex) {
             sender.sendMessage(Component.text("El ID debe ser un número.", NamedTextColor.RED));
+        }
+    }
+
+    /**
+     * Vuelve a entregar el huevo de spawn de un boss que YA existe pero todavía no
+     * tiene punto de aparición ubicado (por ejemplo, si se perdió el huevo original).
+     * No borra ni recrea el boss, solo genera un huevo nuevo apuntando al mismo ID.
+     */
+    private void huevo(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) { sender.sendMessage(Component.text("Solo un jugador puede recibir el huevo.", NamedTextColor.RED)); return; }
+        if (args.length < 2) { player.sendMessage(Component.text("Uso: /boss huevo <id>", NamedTextColor.YELLOW)); return; }
+
+        try {
+            int id = Integer.parseInt(args[1]);
+            BossDefinition def = plugin.getStorage().obtener(id);
+            if (def == null) { player.sendMessage(Component.text("No existe un boss con ID " + id, NamedTextColor.RED)); return; }
+
+            if (def.getSpawnConfig().isUbicado()) {
+                player.sendMessage(Component.text("El boss #" + id + " ya tiene un punto de aparición ubicado. Si querés reubicarlo, usá primero /boss eliminarpunto " + id + ".", NamedTextColor.RED));
+                return;
+            }
+
+            player.getInventory().addItem(com.darkmortol.bosspersonalizados.spawn.BossSpawnEggItem.crear(def));
+            player.sendMessage(Component.text("Te di el huevo de '" + def.getNombre() + "' (#" + id + "). Coloca el huevo para crear su punto de aparición.", NamedTextColor.GREEN));
+        } catch (NumberFormatException ex) {
+            player.sendMessage(Component.text("El ID debe ser un número.", NamedTextColor.RED));
         }
     }
 

@@ -23,6 +23,11 @@ respawn y radios de detección/ataque.
 - `/boss eliminarpunto <id>` — despawnea la entidad si está viva y quita **solo** el punto de
   aparición, conservando habilidades, armadura, respawn y radios ya configurados. Si lo ejecuta
   un jugador, recibe un huevo nuevo para volver a ubicarlo en otro lugar.
+- `/boss huevo <id>` — vuelve a entregar el huevo de spawn de un boss que ya existe pero **todavía
+  no tiene punto de aparición ubicado** (por ejemplo, si se perdió, se dropeó por accidente, o
+  el jugador cerró sesión sin colocarlo). No borra ni recrea el boss, solo genera un huevo nuevo
+  para el mismo ID. Si el boss ya tiene un punto ubicado, el comando lo rechaza y sugiere usar
+  `/boss eliminarpunto <id>` primero.
 - `/boss cancelar` — cancela el wizard en curso.
 
 Permiso: `bosspersonalizados.admin` (default: op).
