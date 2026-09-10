@@ -51,10 +51,10 @@ Permiso: `bosspersonalizados.admin` (default: op).
 8. **Recompensa en monedas** — arranca en 500, se suma/resta de 50 en 50. Se entrega al
    jugador que mata al boss (requiere Vault + un plugin de economía; si no están instalados,
    el plugin sigue funcionando pero no reparte monedas).
-9. **Recompensa en ítem** *(opcional)* — colocá el ítem que querés que suelte el boss al morir
-   en el **primer slot de tu hotbar** (el más a la izquierda) mientras esta pantalla está
-   abierta, y tocá "Confirmar". Si hay más de 1 unidad en ese slot, se toma el stack completo.
-   "Saltar" si no querés recompensa en ítem.
+9. **Recompensa en ítems** *(opcional)* — colocá los ítems que querés que suelte el boss al morir
+   en cualquiera de los **9 slots de tu hotbar** mientras esta pantalla está abierta, y tocá
+   "Confirmar". Se toma lo que haya en cada slot (con su cantidad completa), podés usar 1 solo
+   slot o los 9. "Saltar" si no querés recompensa en ítems.
 10. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
     experiencia se escriben por chat.
 11. Al terminar, el jugador recibe un **huevo de boss** personalizado (solo al crear; al editar
@@ -75,7 +75,7 @@ avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encant
 - Al morir, el boss:
   - da la experiencia configurada al jugador que lo mató;
   - le deposita la recompensa en monedas (vía Vault, si está disponible);
-  - suelta la recompensa en ítem en el suelo, si se configuró una;
+  - suelta todos los ítems de recompensa configurados en el suelo, si hay alguno;
   - si tiene respawn habilitado, vuelve a estar disponible tras el intervalo configurado;
   - si es de **"una sola vez"**, el punto de aparición se borra automáticamente (igual que
     `/boss eliminarpunto`) y no vuelve a aparecer hasta que se le coloque un huevo de nuevo.

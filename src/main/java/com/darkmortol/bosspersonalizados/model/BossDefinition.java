@@ -4,8 +4,10 @@ import com.darkmortol.bosspersonalizados.ability.AbilityType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ public class BossDefinition {
     private int experiencia = 10;
 
     private double recompensaMonedas = 500.0;
-    private ItemStack recompensaItem; // null = sin recompensa de item
+    private final List<ItemStack> recompensaItems = new ArrayList<>(); // vacío = sin recompensa de items
 
     private final SpawnConfig spawnConfig = new SpawnConfig();
 
@@ -66,8 +68,15 @@ public class BossDefinition {
     public double getRecompensaMonedas() { return recompensaMonedas; }
     public void setRecompensaMonedas(double recompensaMonedas) { this.recompensaMonedas = Math.max(0, recompensaMonedas); }
 
-    public ItemStack getRecompensaItem() { return recompensaItem; }
-    public void setRecompensaItem(ItemStack recompensaItem) { this.recompensaItem = recompensaItem; }
+    /** Ítems que el boss suelta al morir (uno por cada slot no vacío del hotbar al configurarlo). */
+    public List<ItemStack> getRecompensaItems() { return recompensaItems; }
+
+    public void setRecompensaItems(List<ItemStack> items) {
+        recompensaItems.clear();
+        if (items != null) recompensaItems.addAll(items);
+    }
+
+    public void limpiarRecompensaItems() { recompensaItems.clear(); }
 
     public SpawnConfig getSpawnConfig() { return spawnConfig; }
 
@@ -82,7 +91,9 @@ public class BossDefinition {
         copia.dano = original.dano;
         copia.experiencia = original.experiencia;
         copia.recompensaMonedas = original.recompensaMonedas;
-        copia.recompensaItem = original.recompensaItem != null ? original.recompensaItem.clone() : null;
+        for (ItemStack item : original.recompensaItems) {
+            copia.recompensaItems.add(item.clone());
+        }
         copia.spawnConfig.copiarDesde(original.spawnConfig);
         return copia;
     }

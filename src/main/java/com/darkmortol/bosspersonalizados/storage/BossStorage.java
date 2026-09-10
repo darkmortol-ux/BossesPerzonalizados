@@ -7,6 +7,7 @@ import com.darkmortol.bosspersonalizados.model.SpawnConfig;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -51,8 +52,13 @@ public class BossStorage {
                 def.setDano(sec.getDouble("dano", 4.0));
                 def.setExperiencia(sec.getInt("experiencia", 10));
                 def.setRecompensaMonedas(sec.getDouble("recompensa-monedas", 500.0));
-                if (sec.isItemStack("recompensa-item")) {
-                    def.setRecompensaItem(sec.getItemStack("recompensa-item"));
+                java.util.List<?> itemsGuardados = sec.getList("recompensa-items");
+                if (itemsGuardados != null) {
+                    java.util.List<ItemStack> items = new java.util.ArrayList<>();
+                    for (Object o : itemsGuardados) {
+                        if (o instanceof ItemStack itemGuardado) items.add(itemGuardado);
+                    }
+                    def.setRecompensaItems(items);
                 }
 
                 for (String hab : sec.getStringList("habilidades")) {
@@ -111,8 +117,10 @@ public class BossStorage {
             yaml.set(base + ".dano", def.getDano());
             yaml.set(base + ".experiencia", def.getExperiencia());
             yaml.set(base + ".recompensa-monedas", def.getRecompensaMonedas());
-            if (def.getRecompensaItem() != null) {
-                yaml.set(base + ".recompensa-item", def.getRecompensaItem());
+            if (!def.getRecompensaItems().isEmpty()) {
+                yaml.set(base + ".recompensa-items", def.getRecompensaItems());
+            } else {
+                yaml.set(base + ".recompensa-items", null);
             }
 
             java.util.List<String> habs = new java.util.ArrayList<>();

@@ -64,8 +64,10 @@ public class BossEventListener implements Listener {
                 killer.giveExp(def.getExperiencia());
                 plugin.getEconomia().depositar(killer, def.getRecompensaMonedas(), plugin);
             }
-            if (def.getRecompensaItem() != null) {
-                e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), def.getRecompensaItem().clone());
+            if (!def.getRecompensaItems().isEmpty()) {
+                for (ItemStack recompensa : def.getRecompensaItems()) {
+                    e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), recompensa.clone());
+                }
             }
         }
 

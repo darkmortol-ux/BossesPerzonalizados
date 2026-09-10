@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GuiListener implements Listener {
@@ -273,21 +274,28 @@ public class GuiListener implements Listener {
         if (slot == ItemRewardGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
 
         if (slot == ItemRewardGUI.SLOT_SALTAR) {
-            def.setRecompensaItem(null);
+            def.limpiarRecompensaItems();
             avanzarAVida(player, sesion);
             return;
         }
 
         if (slot == ItemRewardGUI.SLOT_CONFIRMAR) {
-            // El primer slot del hotbar del jugador (mas a la izquierda) es el indice 0.
-            ItemStack itemEnSlot1 = player.getInventory().getItem(0);
-            if (itemEnSlot1 == null || itemEnSlot1.getType().isAir()) {
-                player.sendMessage(Component.text("No hay ningún ítem en el primer slot de tu hotbar.", NamedTextColor.RED));
+            // Los 9 slots del hotbar del jugador son los indices 0 a 8.
+            List<ItemStack> recompensas = new ArrayList<>();
+            for (int i = 0; i < 9; i++) {
+                ItemStack itemEnSlot = player.getInventory().getItem(i);
+                if (itemEnSlot == null || itemEnSlot.getType().isAir()) continue;
+                recompensas.add(itemEnSlot.clone());
+                player.getInventory().setItem(i, null);
+            }
+
+            if (recompensas.isEmpty()) {
+                player.sendMessage(Component.text("No hay ningún ítem en tu hotbar.", NamedTextColor.RED));
                 return;
             }
-            def.setRecompensaItem(itemEnSlot1.clone());
-            player.getInventory().setItem(0, null);
-            player.sendMessage(Component.text("Recompensa asignada: " + itemEnSlot1.getAmount() + "x " + itemEnSlot1.getType().name(), NamedTextColor.GREEN));
+
+            def.setRecompensaItems(recompensas);
+            player.sendMessage(Component.text("Recompensa asignada: " + recompensas.size() + " tipo(s) de ítem.", NamedTextColor.GREEN));
             avanzarAVida(player, sesion);
         }
     }
