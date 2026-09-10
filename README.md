@@ -107,10 +107,3 @@ instalados en el servidor. Está declarado como `softdepend` en `plugin.yml`, as
 están presentes el plugin arranca igual: solo se salta el depósito de monedas (se loguea un
 aviso una única vez) sin afectar el resto de las funciones.
 
-## Notas de implementación / posibles ajustes
-
-- "Golpe Crítico" y "Furia"/"Fase Invulnerable" están simplificados (efecto inmediato /
-  un solo umbral de vida) para la primera versión; se pueden ampliar a múltiples fases (75/50/25%)
-  si se quiere más profundidad.
-- No se compiló localmente (el entorno de desarrollo no tiene acceso al repositorio de Paper);
-  revisar con `mvn clean package` antes de desplegar.
