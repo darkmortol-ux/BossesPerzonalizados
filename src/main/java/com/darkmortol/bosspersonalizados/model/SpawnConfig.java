@@ -8,6 +8,9 @@ public class SpawnConfig {
     private double radioDeteccion = 15.0; // distancia a la que aparece cuando se acerca un jugador
     private double radioAtaque = 20.0;    // distancia maxima a la que perseguira/atacara
 
+    // Cantidad minima de jugadores dentro del radio de deteccion para que el boss aparezca.
+    private int jugadoresMinimos = 1;
+
     // Ubicacion del punto de spawn (se completa al colocar el huevo)
     private String mundo;
     private double x, y, z;
@@ -34,6 +37,9 @@ public class SpawnConfig {
 
     public double getRadioAtaque() { return radioAtaque; }
     public void setRadioAtaque(double radioAtaque) { this.radioAtaque = radioAtaque; }
+
+    public int getJugadoresMinimos() { return jugadoresMinimos; }
+    public void setJugadoresMinimos(int jugadoresMinimos) { this.jugadoresMinimos = Math.max(1, jugadoresMinimos); }
 
     public int getTiempoGraciaSegundos() { return tiempoGraciaSegundos; }
     public void setTiempoGraciaSegundos(int tiempoGraciaSegundos) { this.tiempoGraciaSegundos = Math.max(0, tiempoGraciaSegundos); }
@@ -119,6 +125,7 @@ public class SpawnConfig {
         this.respawnMinutos = otro.respawnMinutos;
         this.radioDeteccion = otro.radioDeteccion;
         this.radioAtaque = otro.radioAtaque;
+        this.jugadoresMinimos = otro.jugadoresMinimos;
         this.mundo = otro.mundo;
         this.x = otro.x;
         this.y = otro.y;

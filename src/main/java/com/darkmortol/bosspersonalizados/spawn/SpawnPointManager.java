@@ -48,17 +48,14 @@ public class SpawnPointManager {
             if (mundo == null) continue;
 
             Location spawnLoc = new Location(mundo, cfg.getX(), cfg.getY(), cfg.getZ());
-            Player masCercano = null;
-            double distanciaMin = Double.MAX_VALUE;
+            int jugadoresEnRango = 0;
             for (Player p : mundo.getPlayers()) {
-                double dist = p.getLocation().distance(spawnLoc);
-                if (dist <= cfg.getRadioDeteccion() && dist < distanciaMin) {
-                    distanciaMin = dist;
-                    masCercano = p;
+                if (p.getLocation().distance(spawnLoc) <= cfg.getRadioDeteccion()) {
+                    jugadoresEnRango++;
                 }
             }
 
-            if (masCercano != null) {
+            if (jugadoresEnRango >= cfg.getJugadoresMinimos()) {
                 spawnear(def, spawnLoc);
             }
         }
@@ -68,6 +65,9 @@ public class SpawnPointManager {
         LivingEntity entidad = (LivingEntity) loc.getWorld().spawnEntity(loc, def.getTipoMob());
         entidad.customName(Component.text(def.getNombre(), NamedTextColor.DARK_RED));
         entidad.setCustomNameVisible(true);
+        // Evita que el boss desaparezca solo por el despawn natural de mobs hostiles
+        // cuando no hay jugadores cerca (por ejemplo, mientras esta congelado en el spawn).
+        entidad.setRemoveWhenFarAway(false);
         entidad.getPersistentDataContainer().set(BossKeys.BOSS_INSTANCE_ID, org.bukkit.persistence.PersistentDataType.INTEGER, def.getId());
 
         if (entidad.getAttribute(Attribute.MAX_HEALTH) != null) {

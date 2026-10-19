@@ -17,6 +17,10 @@ public class BossInstance {
     private final Map<AbilityType, Long> proximoUsoMillis = new HashMap<>();
     private final Set<Integer> fasesUsadas = new HashSet<>(); // umbrales de % de vida ya disparados
 
+    // True mientras el boss esta "congelado" en su punto de aparicion (sin IA, invulnerable)
+    // porque el jugador que lo atacaba murio o se alejo mas del radio de ataque.
+    private boolean congelado = false;
+
     public BossInstance(int bossId, UUID entityUuid) {
         this.bossId = bossId;
         this.entityUuid = entityUuid;
@@ -41,4 +45,7 @@ public class BossInstance {
     public void marcarFaseUsada(int umbralPorcentaje) {
         fasesUsadas.add(umbralPorcentaje);
     }
+
+    public boolean isCongelado() { return congelado; }
+    public void setCongelado(boolean congelado) { this.congelado = congelado; }
 }

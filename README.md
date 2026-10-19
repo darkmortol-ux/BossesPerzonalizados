@@ -45,19 +45,22 @@ Permiso: `bosspersonalizados.admin` (default: op).
 5. **Respawn** — una sola vez, o con respawn cada X minutos (+1/+5/+10, -1/-5/-10).
 6. **Radios** — radio de detección (a qué distancia aparece cuando se acerca un jugador) y
    radio de ataque/persecución (+5/-5 bloques).
-7. **Tiempo de gracia** — segundos desde que se coloca el huevo hasta que el boss puede aparecer
+7. **Jugadores mínimos** — cantidad de jugadores que deben estar juntos dentro del radio de
+   detección al mismo tiempo para que el boss aparezca (por ejemplo, para bosses pensados para
+   grupo). Empieza en 1; botones de +1/+5/+10 y -1/-5/-10. No puede bajar de 1 jugador.
+8. **Tiempo de gracia** — segundos desde que se coloca el huevo hasta que el boss puede aparecer
    por primera vez, para que el staff que lo colocó tenga tiempo de alejarse. Empieza en 30
    segundos; botones de +30s/+1min/+5min y -30s/-1min/-5min. En 0 aparece de inmediato.
-8. **Recompensa en monedas** — arranca en 500, se suma/resta de 50 en 50. Se entrega al
+9. **Recompensa en monedas** — arranca en 500, se suma/resta de 50 en 50. Se entrega al
    jugador que mata al boss (requiere Vault + un plugin de economía; si no están instalados,
    el plugin sigue funcionando pero no reparte monedas).
-9. **Recompensa en ítems** *(opcional)* — colocá los ítems que querés que suelte el boss al morir
+10. **Recompensa en ítems** *(opcional)* — colocá los ítems que querés que suelte el boss al morir
    en cualquiera de los **9 slots de tu hotbar** mientras esta pantalla está abierta, y tocá
    "Confirmar". Se toma lo que haya en cada slot (con su cantidad completa), podés usar 1 solo
    slot o los 9. "Saltar" si no querés recompensa en ítems.
-10. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
+11. **Nombre, vida, daño y experiencia** — el nombre se pide en el comando; vida, daño y
     experiencia se escriben por chat.
-11. Al terminar, el jugador recibe un **huevo de boss** personalizado (solo al crear; al editar
+12. Al terminar, el jugador recibe un **huevo de boss** personalizado (solo al crear; al editar
     no se entrega huevo nuevo). Clic derecho sobre un bloque coloca el punto de aparición y
     arranca el tiempo de gracia.
 
@@ -66,12 +69,17 @@ avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encant
 
 ## Funcionamiento en el mundo
 
-- Un scheduler revisa cada segundo los puntos de spawn: si hay un jugador dentro del radio
-  de detección, ya pasó el tiempo de gracia, y el boss puede aparecer (primera vez, o pasó el
-  intervalo de respawn), lo invoca.
+- Un scheduler revisa cada segundo los puntos de spawn: si hay al menos la cantidad **mínima de
+  jugadores** configurada dentro del radio de detección al mismo tiempo, ya pasó el tiempo de
+  gracia, y el boss puede aparecer (primera vez, o pasó el intervalo de respawn), lo invoca.
 - Otro scheduler revisa cada segundo los bosses vivos: dispara habilidades por cooldown
   aleatorio (dentro de su rango), por proximidad (solo si hay un jugador cerca), o al cruzar
   umbrales de vida baja (furia, huida, fase invulnerable, refuerzos), saltando el cooldown.
+- Si el jugador que lo atacaba **muere** o **se aleja más del radio de ataque** (y no queda
+  nadie más vivo dentro de ese radio), el boss vuelve teletransportado a su punto de aparición
+  y se **congela** ahí (sin IA, invulnerable, sin objetivo) — no se destruye ni se vuelve a
+  crear, sigue siendo la misma entidad con su vida actual. Se descongela automáticamente en
+  cuanto un jugador vuelve a entrar al radio de detección, y retoma el combate con normalidad.
 - Al morir, el boss:
   - da la experiencia configurada al jugador que lo mató;
   - le deposita la recompensa en monedas (vía Vault, si está disponible);
@@ -107,3 +115,10 @@ instalados en el servidor. Está declarado como `softdepend` en `plugin.yml`, as
 están presentes el plugin arranca igual: solo se salta el depósito de monedas (se loguea un
 aviso una única vez) sin afectar el resto de las funciones.
 
+## Notas de implementación / posibles ajustes
+
+- "Golpe Crítico" y "Furia"/"Fase Invulnerable" están simplificados (efecto inmediato /
+  un solo umbral de vida) para la primera versión; se pueden ampliar a múltiples fases (75/50/25%)
+  si se quiere más profundidad.
+- No se compiló localmente (el entorno de desarrollo no tiene acceso al repositorio de Paper);
+  revisar con `mvn clean package` antes de desplegar.

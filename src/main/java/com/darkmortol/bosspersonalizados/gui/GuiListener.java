@@ -46,6 +46,7 @@ public class GuiListener implements Listener {
             case ENCHANT_SELECTION -> manejarEncantamientos(player, sesion, clicked, slot, e);
             case RESPAWN_CONFIG -> manejarRespawn(player, sesion, slot, e);
             case RADIUS_CONFIG -> manejarRadios(player, sesion, slot, e);
+            case MIN_PLAYERS -> manejarJugadoresMinimos(player, sesion, slot, e);
             case GRACE_TIME -> manejarTiempoGracia(player, sesion, slot, e);
             case COIN_REWARD -> manejarMonedas(player, sesion, slot, e);
             case ITEM_REWARD -> manejarItemRecompensa(player, sesion, slot, e);
@@ -216,8 +217,8 @@ public class GuiListener implements Listener {
         if (slot == RadiusConfigGUI.SLOT_ATRAS) { player.openInventory(RespawnConfigGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.RESPAWN); return; }
         if (slot == RadiusConfigGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
         if (slot == RadiusConfigGUI.SLOT_SIGUIENTE) {
-            sesion.setPaso(WizardSession.Paso.TIEMPO_GRACIA);
-            player.openInventory(GraceTimeGUI.build(sesion));
+            sesion.setPaso(WizardSession.Paso.JUGADORES_MINIMOS);
+            player.openInventory(MinPlayersGUI.build(sesion));
             return;
         }
         if (slot == RadiusConfigGUI.SLOT_DETECCION_MAS) cfg.setRadioDeteccion(cfg.getRadioDeteccion() + 5);
@@ -228,11 +229,32 @@ public class GuiListener implements Listener {
         RadiusConfigGUI.refrescar(e.getInventory(), sesion);
     }
 
-    // ===== PASO 6.5: TIEMPO DE GRACIA =====
+    // ===== PASO 6.5: JUGADORES MINIMOS =====
+    private void manejarJugadoresMinimos(Player player, WizardSession sesion, int slot, InventoryClickEvent e) {
+        SpawnConfig cfg = sesion.getDefinicion().getSpawnConfig();
+
+        if (slot == MinPlayersGUI.SLOT_ATRAS) { player.openInventory(RadiusConfigGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.RADIOS); return; }
+        if (slot == MinPlayersGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
+        if (slot == MinPlayersGUI.SLOT_SIGUIENTE) {
+            sesion.setPaso(WizardSession.Paso.TIEMPO_GRACIA);
+            player.openInventory(GraceTimeGUI.build(sesion));
+            return;
+        }
+        if (slot == MinPlayersGUI.SLOT_MAS_1) cfg.setJugadoresMinimos(cfg.getJugadoresMinimos() + 1);
+        else if (slot == MinPlayersGUI.SLOT_MAS_5) cfg.setJugadoresMinimos(cfg.getJugadoresMinimos() + 5);
+        else if (slot == MinPlayersGUI.SLOT_MAS_10) cfg.setJugadoresMinimos(cfg.getJugadoresMinimos() + 10);
+        else if (slot == MinPlayersGUI.SLOT_MENOS_1) cfg.setJugadoresMinimos(cfg.getJugadoresMinimos() - 1);
+        else if (slot == MinPlayersGUI.SLOT_MENOS_5) cfg.setJugadoresMinimos(cfg.getJugadoresMinimos() - 5);
+        else if (slot == MinPlayersGUI.SLOT_MENOS_10) cfg.setJugadoresMinimos(cfg.getJugadoresMinimos() - 10);
+        else return;
+        MinPlayersGUI.refrescar(e.getInventory(), sesion);
+    }
+
+    // ===== PASO 6.7: TIEMPO DE GRACIA =====
     private void manejarTiempoGracia(Player player, WizardSession sesion, int slot, InventoryClickEvent e) {
         SpawnConfig cfg = sesion.getDefinicion().getSpawnConfig();
 
-        if (slot == GraceTimeGUI.SLOT_ATRAS) { player.openInventory(RadiusConfigGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.RADIOS); return; }
+        if (slot == GraceTimeGUI.SLOT_ATRAS) { player.openInventory(MinPlayersGUI.build(sesion)); sesion.setPaso(WizardSession.Paso.JUGADORES_MINIMOS); return; }
         if (slot == GraceTimeGUI.SLOT_CANCELAR) { cancelar(player, sesion); return; }
         if (slot == GraceTimeGUI.SLOT_SIGUIENTE) {
             sesion.setPaso(WizardSession.Paso.RECOMPENSA_MONEDAS);

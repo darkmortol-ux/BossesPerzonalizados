@@ -3,9 +3,14 @@ package com.darkmortol.bosspersonalizados.ability;
 import com.darkmortol.bosspersonalizados.BossPersonalizadosPlugin;
 import com.darkmortol.bosspersonalizados.model.BossDefinition;
 import com.darkmortol.bosspersonalizados.model.BossInstance;
+import com.darkmortol.bosspersonalizados.model.SpawnConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -63,6 +68,11 @@ public class AbilityRunner {
             BossInstance instancia = instanciasActivas.get(bossId);
             if (def == null || instancia == null) continue;
 
+            // Si el jugador que lo atacaba murio o se alejo demasiado, el boss vuelve al
+            // punto de aparicion y se congela hasta que alguien se vuelva a acercar.
+            // Mientras esta congelado no ejecuta habilidades ni busca objetivo.
+            if (gestionarRetornoYCongelamiento(def, boss, instancia)) continue;
+
             Player objetivo = jugadorMasCercano(boss, def.getSpawnConfig().getRadioAtaque());
             if (objetivo == null) continue;
 
@@ -100,6 +110,57 @@ public class AbilityRunner {
                 instancia.marcarUsada(elegida, segundos * 1000L);
             }
         }
+    }
+
+    /**
+     * Controla el retorno y congelamiento del boss. Devuelve true si el boss sigue (o
+     * acaba de quedar) congelado en este tick, en cuyo caso no debe hacer nada mas.
+     */
+    private boolean gestionarRetornoYCongelamiento(BossDefinition def, LivingEntity boss, BossInstance instancia) {
+        SpawnConfig cfg = def.getSpawnConfig();
+        if (!cfg.isUbicado()) return false;
+
+        World mundo = Bukkit.getWorld(cfg.getMundo());
+        if (mundo == null) return false;
+        Location spawnLoc = new Location(mundo, cfg.getX(), cfg.getY(), cfg.getZ());
+
+        if (instancia.isCongelado()) {
+            // Sigue congelado hasta que un jugador se acerque dentro del radio de deteccion.
+            for (Player p : mundo.getPlayers()) {
+                if (!p.isDead() && p.getLocation().distance(spawnLoc) <= cfg.getRadioDeteccion()) {
+                    descongelar(boss, instancia);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // No esta congelado: revisa si hay que volver (el jugador murio o se alejo mas
+        // del radio de ataque y ya no queda nadie vivo dentro de ese radio).
+        boolean hayJugadorEnRango = false;
+        for (Entity e : boss.getNearbyEntities(cfg.getRadioAtaque(), cfg.getRadioAtaque(), cfg.getRadioAtaque())) {
+            if (e instanceof Player p && !p.isDead()) { hayJugadorEnRango = true; break; }
+        }
+
+        if (!hayJugadorEnRango) {
+            congelarEnSpawn(boss, instancia, spawnLoc);
+            return true;
+        }
+        return false;
+    }
+
+    private void congelarEnSpawn(LivingEntity boss, BossInstance instancia, Location spawnLoc) {
+        boss.teleport(spawnLoc);
+        boss.setAI(false);
+        boss.setInvulnerable(true);
+        if (boss instanceof Mob mob) mob.setTarget(null);
+        instancia.setCongelado(true);
+    }
+
+    private void descongelar(LivingEntity boss, BossInstance instancia) {
+        boss.setAI(true);
+        boss.setInvulnerable(false);
+        instancia.setCongelado(false);
     }
 
     private Player jugadorMasCercano(LivingEntity boss, double radio) {
