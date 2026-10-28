@@ -37,6 +37,56 @@ public class SpawnPointManager {
 
     public Map<Integer, BossInstance> getInstanciasActivas() { return instanciasActivas; }
 
+    /**
+     * Se ejecuta una sola vez al arrancar el plugin (onEnable). Los mapas de instancias
+     * activas de SpawnPointManager y AbilityRunner viven solo en memoria: si el servidor se
+     * reinicia o el plugin se recarga mientras un boss estaba vivo, esos mapas quedan vacios
+     * aunque la entidad siga existiendo en el mundo (y, si justo estaba congelada, su estado
+     * sin IA e invulnerable queda guardado en la entidad y nadie vuelve a tocarlo).
+     * Este metodo busca esas entidades "huerfanas" por su marca de bossId, las vuelve a
+     * registrar para que el plugin las siga gestionando (habilidades, retorno/congelamiento),
+     * y las reactiva por si habian quedado congeladas. Si no encuentra la entidad (se perdio
+     * de verdad), libera el punto de spawn para que vuelva a aparecer con normalidad.
+     */
+    public void recuperarInstanciasActivas() {
+        boolean huboCambios = false;
+        for (BossDefinition def : plugin.getStorage().todos().values()) {
+            SpawnConfig cfg = def.getSpawnConfig();
+            if (!cfg.isUbicado() || !cfg.isVivoActualmente()) continue;
+
+            World mundo = Bukkit.getWorld(cfg.getMundo());
+            if (mundo == null) continue;
+
+            // Fuerza la carga del chunk del punto de spawn para poder encontrar la entidad.
+            mundo.getChunkAt((int) Math.floor(cfg.getX()) >> 4, (int) Math.floor(cfg.getZ()) >> 4).load();
+
+            LivingEntity encontrada = null;
+            for (org.bukkit.entity.Entity e : mundo.getEntities()) {
+                if (!(e instanceof LivingEntity le)) continue;
+                Integer idGuardado = le.getPersistentDataContainer()
+                        .get(BossKeys.BOSS_INSTANCE_ID, org.bukkit.persistence.PersistentDataType.INTEGER);
+                if (idGuardado != null && idGuardado == def.getId()) { encontrada = le; break; }
+            }
+
+            if (encontrada == null) {
+                // La entidad ya no existe (se perdio en algun reinicio anterior a esta
+                // version): liberamos el punto para que vuelva a aparecer normalmente.
+                cfg.setVivoActualmente(false);
+                huboCambios = true;
+                continue;
+            }
+
+            encontrada.setAI(true);
+            encontrada.setInvulnerable(false);
+            encontrada.setRemoveWhenFarAway(false);
+
+            BossInstance instancia = new BossInstance(def.getId(), encontrada.getUniqueId());
+            instanciasActivas.put(def.getId(), instancia);
+            plugin.getAbilityRunner().registrarInstancia(def, encontrada, instancia);
+        }
+        if (huboCambios) plugin.getStorage().guardar();
+    }
+
     private void revisarTodos() {
         for (BossDefinition def : plugin.getStorage().todos().values()) {
             SpawnConfig cfg = def.getSpawnConfig();
@@ -70,12 +120,12 @@ public class SpawnPointManager {
         entidad.setRemoveWhenFarAway(false);
         entidad.getPersistentDataContainer().set(BossKeys.BOSS_INSTANCE_ID, org.bukkit.persistence.PersistentDataType.INTEGER, def.getId());
 
-        if (entidad.getAttribute(Attribute.MAX_HEALTH) != null) {
-            entidad.getAttribute(Attribute.MAX_HEALTH).setBaseValue(def.getVida());
+        if (entidad.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null) {
+            entidad.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(def.getVida());
             entidad.setHealth(def.getVida());
         }
-        if (entidad.getAttribute(Attribute.ATTACK_DAMAGE) != null) {
-            entidad.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(def.getDano());
+        if (entidad.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE) != null) {
+            entidad.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(def.getDano());
         }
 
         EntityEquipment eq = entidad.getEquipment();

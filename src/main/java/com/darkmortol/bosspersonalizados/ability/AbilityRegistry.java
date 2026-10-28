@@ -69,8 +69,8 @@ public final class AbilityRegistry {
     static {
         // ===== OFENSIVAS =====
         reg(AbilityType.GOLPE_PESADO, 8, 15, AbilityTrigger.PROXIMIDAD, 3.0, (boss, obj, inst) -> {
-            obj.damage(boss.getAttribute(org.bukkit.attribute.Attribute.ATTACK_DAMAGE) != null
-                    ? boss.getAttribute(org.bukkit.attribute.Attribute.ATTACK_DAMAGE).getValue() * 0.5 : 3.0, boss);
+            obj.damage(boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE) != null
+                    ? boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE).getValue() * 0.5 : 3.0, boss);
             Vector empuje = obj.getLocation().toVector().subtract(boss.getLocation().toVector()).normalize().setY(0.4);
             obj.setVelocity(empuje.multiply(1.4));
         });
@@ -102,8 +102,8 @@ public final class AbilityRegistry {
         });
 
         reg(AbilityType.CRITICO_GARANTIZADO, 15, 25, AbilityTrigger.PROXIMIDAD, 4.0, (boss, obj, inst) -> {
-            obj.damage(boss.getAttribute(org.bukkit.attribute.Attribute.ATTACK_DAMAGE) != null
-                    ? boss.getAttribute(org.bukkit.attribute.Attribute.ATTACK_DAMAGE).getValue() * 2.0 : 6.0, boss);
+            obj.damage(boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE) != null
+                    ? boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE).getValue() * 2.0 : 6.0, boss);
         });
 
         reg(AbilityType.VENENO_GOLPE, 10, 18, AbilityTrigger.PROXIMIDAD, 3.0, (boss, obj, inst) ->
@@ -114,7 +114,7 @@ public final class AbilityRegistry {
 
         reg(AbilityType.LENTITUD_AREA, 12, 20, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) -> {
             for (Entity e : boss.getNearbyEntities(6, 4, 6)) {
-                if (e instanceof Player p) p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 1));
+                if (e instanceof Player p) p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 1));
             }
         });
 
@@ -128,17 +128,17 @@ public final class AbilityRegistry {
 
         // ===== DEFENSIVAS =====
         reg(AbilityType.ESCUDO_TEMPORAL, 20, 30, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) ->
-                boss.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 100, 1)));
+                boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 1)));
 
         reg(AbilityType.REGENERACION, 20, 30, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) ->
                 boss.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 1)));
 
         reg(AbilityType.INMUNIDAD_TEMPORAL, 25, 35, AbilityTrigger.VIDA_BAJA, 25, (boss, obj, inst) ->
-                boss.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 40, 4)));
+                boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 4)));
 
         reg(AbilityType.REFLEJO_DANO, 20, 30, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) -> {
             // El reflejo real de daño se maneja en el listener de EntityDamageByEntityEvent.
-            boss.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 60, 0));
+            boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 0));
         });
 
         reg(AbilityType.TELETRANSPORTE_HUIDA, 30, 30, AbilityTrigger.VIDA_BAJA, 20, (boss, obj, inst) -> {
@@ -153,11 +153,11 @@ public final class AbilityRegistry {
 
         reg(AbilityType.FURIA, 999, 999, AbilityTrigger.VIDA_BAJA, 30, (boss, obj, inst) -> {
             boss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1));
-            boss.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 1));
+            boss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 1));
         });
 
         reg(AbilityType.FASE_INVULNERABLE, 999, 999, AbilityTrigger.VIDA_BAJA, 50, (boss, obj, inst) ->
-                boss.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 60, 4)));
+                boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 4)));
 
         // ===== INVOCACION =====
         reg(AbilityType.CREAR_SUBDITOS, 30, 45, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) ->
@@ -169,9 +169,9 @@ public final class AbilityRegistry {
         reg(AbilityType.CLON_FANTASMA, 45, 60, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) -> {
             List<Entity> clones = invocarMobs(boss, 1, boss.getType());
             for (Entity e : clones) {
-                if (e instanceof LivingEntity le && le.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) != null) {
-                    double mitad = boss.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getBaseValue() * 0.4;
-                    le.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).setBaseValue(mitad);
+                if (e instanceof LivingEntity le && le.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH) != null) {
+                    double mitad = boss.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getBaseValue() * 0.4;
+                    le.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).setBaseValue(mitad);
                     le.setHealth(Math.min(mitad, le.getHealth()));
                 }
             }
@@ -200,7 +200,7 @@ public final class AbilityRegistry {
                 obj.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 0)));
 
         reg(AbilityType.CONFUSION, 15, 25, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) ->
-                obj.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 150, 0)));
+                obj.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 150, 0)));
 
         reg(AbilityType.SALTO_REPENTINO, 10, 18, AbilityTrigger.COOLDOWN, 0, (boss, obj, inst) -> {
             Vector direccion = obj.getLocation().toVector().subtract(boss.getLocation().toVector()).normalize();

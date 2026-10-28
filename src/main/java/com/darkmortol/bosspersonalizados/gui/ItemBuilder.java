@@ -5,6 +5,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -52,7 +54,12 @@ public class ItemBuilder {
     }
 
     public ItemBuilder brillo() {
-        meta.setEnchantmentGlintOverride(true);
+        // Truco clasico compatible con todas las versiones (1.20 en adelante): agrega un
+        // encantamiento sin efecto real y oculta la lista de encantamientos, para que el
+        // item se vea "brillante" sin mostrar ningun encantamiento en la descripcion.
+        Enchantment duracion = org.bukkit.Registry.ENCHANTMENT.get(NamespacedKey.minecraft("unbreaking"));
+        if (duracion != null) meta.addEnchant(duracion, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         return this;
     }
 

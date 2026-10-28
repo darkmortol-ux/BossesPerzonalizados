@@ -1,8 +1,30 @@
 # BossPersonalizados
 
-Plugin para Paper 1.21.11 (Java 21) que permite crear bosses totalmente personalizados
-mediante inventarios (GUIs), sin tocar código: mob, habilidades, armadura, encantamientos,
-respawn y radios de detección/ataque.
+Plugin para Paper que permite crear bosses totalmente personalizados mediante inventarios
+(GUIs), sin tocar código: mob, habilidades, armadura, encantamientos, respawn y radios de
+detección/ataque.
+
+## Compatibilidad de versiones
+
+Un solo jar, compatible con **Paper 1.20, 1.21 y versiones más nuevas de esa línea**:
+
+- Se compila contra la API de **1.20.1** (la más vieja soportada) y el bytecode se genera
+  para **Java 17**. La API de Paper es retrocompatible "hacia adelante": un jar compilado
+  contra 1.20.1 corre sin problema en 1.20.x, 1.21.x y versiones más nuevas, pero no al
+  revés. Java 17 es el mínimo que corre tanto en servidores 1.20 (que requiere Java 17) como
+  en 1.21 (que requiere Java 21 — y un JVM 21 sí puede ejecutar bytecode compilado para 17).
+- Por eso **no se ofrecen como mob base** `BOGGED` ni `BREEZE` en la pantalla de selección:
+  son mobs agregados recién en 1.21 y no existen en 1.20.
+- Las pociones, encantamientos y atributos (`PotionEffectType`, `Attribute`) usan los
+  nombres **clásicos** (`SLOW`, `CONFUSION`, `DAMAGE_RESISTANCE`, `INCREASE_DAMAGE`,
+  `GENERIC_MAX_HEALTH`, `GENERIC_ATTACK_DAMAGE`), que son los que existen en todo el rango
+  1.20–1.21 (los nombres nuevos recién se agregaron como alias en 1.20.5+, y los viejos
+  siguen funcionando igual en 1.21). Los encantamientos en sí se leen por
+  `Registry.ENCHANTMENT` (por clave, no por constante fija), que también es estable en todo
+  ese rango.
+- Si en el futuro agregás código nuevo, evitá nombres "nuevos" de constantes de Minecraft
+  (revisá que existan desde 1.20.1) y evitá mobs/materiales agregados después de 1.20, salvo
+  que aceptes perder soporte para versiones viejas.
 
 ## Comandos
 
@@ -80,6 +102,9 @@ avanzar sin elegir nada en los pasos opcionales (habilidades / armadura / encant
   y se **congela** ahí (sin IA, invulnerable, sin objetivo) — no se destruye ni se vuelve a
   crear, sigue siendo la misma entidad con su vida actual. Se descongela automáticamente en
   cuanto un jugador vuelve a entrar al radio de detección, y retoma el combate con normalidad.
+- Al arrancar el plugin (inicio del servidor o `/reload`), busca en el mundo las entidades de
+  bosses que ya estaban vivos antes del arranque y las vuelve a registrar (y las reactiva por
+  si habían quedado congeladas), para que no se queden sin reaccionar "huérfanas" en memoria.
 - Al morir, el boss:
   - da la experiencia configurada al jugador que lo mató;
   - le deposita la recompensa en monedas (vía Vault, si está disponible);

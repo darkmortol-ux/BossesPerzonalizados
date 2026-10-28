@@ -13,8 +13,11 @@
     <description>Plugin para crear y gestionar bosses personalizados con habilidades, armadura y puntos de spawn.</description>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <!-- Java 17 es el minimo comun entre 1.20 (requiere Java 17) y 1.21 (requiere
+             Java 21). Compilar a 17 produce un jar que corre en ambos, porque un JVM 21
+             puede ejecutar bytecode compilado para 17 sin problema (pero no al reves). -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -30,10 +33,16 @@
     </repositories>
 
     <dependencies>
+        <!-- Se compila contra la API de la version MAS VIEJA que se quiere soportar (1.20,
+             primer release de esa linea). La API de Paper/Bukkit es retrocompatible "hacia
+             adelante": un jar compilado contra 1.20.1 corre sin problema en 1.20.x, 1.21.x y
+             versiones mas nuevas, porque esos metodos siguen existiendo ahi. Lo que NO
+             funciona es al reves (compilar contra una version nueva y correr en una vieja),
+             porque ahi si pueden faltar metodos/clases nuevas. -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.11-R0.1-SNAPSHOT</version>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -52,7 +61,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
         </plugins>

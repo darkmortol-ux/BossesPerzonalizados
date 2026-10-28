@@ -76,8 +76,8 @@ public class AbilityRunner {
             Player objetivo = jugadorMasCercano(boss, def.getSpawnConfig().getRadioAtaque());
             if (objetivo == null) continue;
 
-            double vidaPorcentaje = boss.getAttribute(Attribute.MAX_HEALTH) != null
-                    ? (boss.getHealth() / boss.getAttribute(Attribute.MAX_HEALTH).getValue()) * 100.0 : 100.0;
+            double vidaPorcentaje = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null
+                    ? (boss.getHealth() / boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) * 100.0 : 100.0;
 
             // 1) Habilidades por VIDA_BAJA: se disparan una sola vez por umbral cruzado.
             for (AbilityType tipo : def.getHabilidades()) {

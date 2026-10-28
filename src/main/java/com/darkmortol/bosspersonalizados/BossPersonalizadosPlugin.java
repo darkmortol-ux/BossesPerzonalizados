@@ -33,6 +33,10 @@ public class BossPersonalizadosPlugin extends JavaPlugin {
         var comando = new BossCommand(this);
         getCommand("boss").setExecutor(comando);
 
+        // Reconecta los bosses que ya estaban vivos antes de este arranque (reinicio o
+        // /reload), por si quedaron sin registrar en memoria o congelados de antes.
+        spawnPointManager.recuperarInstanciasActivas();
+
         spawnPointManager.iniciar();
         abilityRunner.iniciar();
 

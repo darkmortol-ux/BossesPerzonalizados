@@ -17,9 +17,12 @@ import java.util.List;
 public class MobSelectionGUI {
 
     // Ender Dragon y Wither quedan afuera: se crean con /boss crear <nombre> ENDER_DRAGON|WITHER
+    // NOTA multi-version (1.20/1.21 en adelante): BOGGED y BREEZE son mobs agregados en 1.21
+    // y no existen como EntityType en versiones anteriores, por lo que NO se incluyen aqui a
+    // proposito (de lo contrario el plugin no compilaria contra la API de 1.20).
     private static final EntityType[] MOBS_HOSTILES = {
             EntityType.ZOMBIE, EntityType.HUSK, EntityType.DROWNED, EntityType.ZOMBIE_VILLAGER,
-            EntityType.SKELETON, EntityType.STRAY, EntityType.BOGGED,
+            EntityType.SKELETON, EntityType.STRAY,
             EntityType.CREEPER, EntityType.SPIDER, EntityType.CAVE_SPIDER,
             EntityType.ENDERMAN, EntityType.ENDERMITE, EntityType.SILVERFISH,
             EntityType.WITCH, EntityType.SLIME, EntityType.MAGMA_CUBE,
@@ -27,7 +30,7 @@ public class MobSelectionGUI {
             EntityType.PILLAGER, EntityType.VINDICATOR, EntityType.EVOKER, EntityType.VEX, EntityType.RAVAGER,
             EntityType.GUARDIAN, EntityType.ELDER_GUARDIAN, EntityType.SHULKER,
             EntityType.PIGLIN, EntityType.PIGLIN_BRUTE, EntityType.HOGLIN, EntityType.ZOGLIN,
-            EntityType.WARDEN, EntityType.BREEZE
+            EntityType.WARDEN
     };
 
     public static Inventory build() {
